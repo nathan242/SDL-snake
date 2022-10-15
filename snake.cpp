@@ -8,7 +8,7 @@
 
 #define BOX_SZ 10
 #define MAX_SNAKE_SEGMENTS 4800
-#define INITIAL_SNAKE_SEGMENTS 5
+#define INITIAL_SNAKE_SEGMENTS 16
 #define SNAKE_START_X 40
 #define SNAKE_START_Y 30
 
@@ -29,10 +29,12 @@ struct snake_list
 snake_list* snake_head;
 snake_list* snake_tail;
 
+grid *grid = new class grid(BOX_SZ, BOX_SZ, RES_X, RES_Y);
+
 void add_snake_part(graphics_obj* obj)
 {
     snake_list* part = new snake_list;
-    snake_list* current = new snake_list;
+    snake_list* current;
 
     part->obj = obj;
     part->next = NULL;
@@ -63,6 +65,27 @@ void move_snake(graphics_obj* obj)
     snake_head->obj = obj;
 }
 
+bool snake_is_at(int x, int y, snake_list* start = NULL)
+{
+    grid_pos *pos = NULL;
+    snake_list* current;
+
+    if (start != NULL) {
+        current = start;
+    } else {
+        current = snake_tail;
+    }
+
+    do {
+        pos = grid->get_pos(current->obj);
+        if (pos->x == x && pos->y == y) { return true; }
+
+        current = current->next;
+    } while (current != NULL);
+
+    return false;
+}
+
 void snake()
 {
     // bool vars for control directions and quit event
@@ -75,7 +98,6 @@ void snake()
     int snake_direction = SNAKE_DIRECTION_DOWN;
 
     graphics *window = new graphics("SDL SNAKE", RES_X, RES_Y, BPP);
-    grid *grid = new class grid(BOX_SZ, BOX_SZ, RES_X, RES_Y);
     grid_pos *grid_pos = NULL;
 
     // Game objects
@@ -182,7 +204,7 @@ void snake()
 
         }
 
-        if (grid->pos_inside(grid_pos->x, grid_pos->y)) {
+        if (grid->pos_inside(grid_pos->x, grid_pos->y) && !snake_is_at(grid_pos->x, grid_pos->y, snake_tail->next)) {
             grid->set_pos(snake_tail->obj, grid_pos->x, grid_pos->y);
             move_snake(snake_tail->obj);
         } else {
