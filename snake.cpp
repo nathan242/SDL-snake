@@ -12,6 +12,7 @@
 #define INITIAL_SNAKE_SEGMENTS 3
 #define SNAKE_START_X 40
 #define SNAKE_START_Y 30
+#define SNAKE_MOVE_DELAY 20
 
 #define SNAKE_DIRECTION_STOPPED 0
 #define SNAKE_DIRECTION_DOWN 1
@@ -32,6 +33,7 @@ snake_list* snake_tail;
 
 grid *grid = new class grid(BOX_SZ, BOX_SZ, RES_X, RES_Y);
 int snake_part_count = 0;
+int snake_delay_count = 0;
 
 void add_snake_part(graphics_obj* obj)
 {
@@ -223,39 +225,44 @@ void snake()
             pos = grid->get_pos(snake_head->obj);
         }
 
-        switch (snake_direction) {
-            case SNAKE_DIRECTION_DOWN:
-                pos->y++;
-                break;
+        if (snake_delay_count == SNAKE_MOVE_DELAY) {
+            snake_delay_count = 0;
 
-            case SNAKE_DIRECTION_LEFT:
-                pos->x--;
-                break;
+            switch (snake_direction) {
+                case SNAKE_DIRECTION_DOWN:
+                    pos->y++;
+                    break;
 
-            case SNAKE_DIRECTION_RIGHT:
-                pos->x++;
-                break;
+                case SNAKE_DIRECTION_LEFT:
+                    pos->x--;
+                    break;
 
-            case SNAKE_DIRECTION_UP:
-                pos->y--;
-                break;
+                case SNAKE_DIRECTION_RIGHT:
+                    pos->x++;
+                    break;
 
-        }
+                case SNAKE_DIRECTION_UP:
+                    pos->y--;
+                    break;
+            }
 
-        if (pos->x == food_pos->x && pos->y == food_pos->y) {
-            snake_food->sprite = snake_sprite;
-            add_snake_part(snake_food);
-            snake_food = add_rand_snake_food(window, snake_parts, snake_food_sprite);
-            food_pos = grid->get_pos(snake_food);
-        } else if (grid->pos_inside(pos->x, pos->y) && !snake_is_at(pos->x, pos->y, snake_tail->next)) {
-            grid->set_pos(snake_tail->obj, pos->x, pos->y);
-            move_snake(snake_tail->obj);
+            if (pos->x == food_pos->x && pos->y == food_pos->y) {
+                snake_food->sprite = snake_sprite;
+                add_snake_part(snake_food);
+                snake_food = add_rand_snake_food(window, snake_parts, snake_food_sprite);
+                food_pos = grid->get_pos(snake_food);
+            } else if (grid->pos_inside(pos->x, pos->y) && !snake_is_at(pos->x, pos->y, snake_tail->next)) {
+                grid->set_pos(snake_tail->obj, pos->x, pos->y);
+                move_snake(snake_tail->obj);
+            } else {
+                snake_direction = SNAKE_DIRECTION_STOPPED;
+            }
         } else {
-            snake_direction = SNAKE_DIRECTION_STOPPED;
+            snake_delay_count++;
         }
 
         // Redraw screen
-        window->draw(200);
+        window->draw(2);
     }
 
     SDL_Quit();
