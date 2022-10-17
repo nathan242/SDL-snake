@@ -32,3 +32,13 @@ bool grid::pos_inside(int x, int y)
     return x >= 0 && x < grid_sz_x && y >= 0 && y < grid_sz_y;
 }
 
+int grid::get_grid_sz_x()
+{
+    return grid_sz_x;
+}
+
+int grid::get_grid_sz_y()
+{
+    return grid_sz_y;
+}
+
