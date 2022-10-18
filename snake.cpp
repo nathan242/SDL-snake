@@ -144,7 +144,7 @@ graphics_obj *add_rand_snake_food(graphics *window, graphics_obj *snake_parts[],
     return add_snake_food(window, snake_parts, sprite, rand_x, rand_y);
 }
 
-void snake(int res_x, int res_y)
+int snake(int res_x, int res_y)
 {
     // bool vars for control directions and quit event
     bool quit = false;
@@ -155,6 +155,8 @@ void snake(int res_x, int res_y)
 
     int snake_direction = SNAKE_DIRECTION_DOWN;
     int snake_last_moved = snake_direction;
+
+    int score = 0;
 
     graphics *window = new graphics("SDL SNAKE", res_x, res_y, BPP);
     grid_obj = new class grid(BOX_SZ, BOX_SZ, res_x, res_y);
@@ -239,36 +241,40 @@ void snake(int res_x, int res_y)
         if (snake_delay_count == SNAKE_MOVE_DELAY) {
             snake_delay_count = 0;
 
-            switch (snake_direction) {
-                case SNAKE_DIRECTION_DOWN:
-                    pos->y++;
-                    break;
+            if (snake_direction != SNAKE_DIRECTION_STOPPED) {
+                switch (snake_direction) {
+                    case SNAKE_DIRECTION_DOWN:
+                        pos->y++;
+                        break;
 
-                case SNAKE_DIRECTION_LEFT:
-                    pos->x--;
-                    break;
+                    case SNAKE_DIRECTION_LEFT:
+                        pos->x--;
+                        break;
 
-                case SNAKE_DIRECTION_RIGHT:
-                    pos->x++;
-                    break;
+                    case SNAKE_DIRECTION_RIGHT:
+                        pos->x++;
+                        break;
 
-                case SNAKE_DIRECTION_UP:
-                    pos->y--;
-                    break;
-            }
+                    case SNAKE_DIRECTION_UP:
+                        pos->y--;
+                        break;
+                }
 
-            snake_last_moved = snake_direction;
+                snake_last_moved = snake_direction;
 
-            if (pos->x == food_pos->x && pos->y == food_pos->y) {
-                snake_food->sprite = snake_sprite;
-                add_snake_part(snake_food);
-                snake_food = add_rand_snake_food(window, snake_parts, snake_food_sprite);
-                food_pos = grid_obj->get_pos(snake_food);
-            } else if (grid_obj->pos_inside(pos->x, pos->y) && !snake_is_at(pos->x, pos->y, snake_tail->next)) {
-                grid_obj->set_pos(snake_tail->obj, pos->x, pos->y);
-                move_snake(snake_tail->obj);
-            } else {
-                snake_direction = SNAKE_DIRECTION_STOPPED;
+                if (pos->x == food_pos->x && pos->y == food_pos->y) {
+                    snake_food->sprite = snake_sprite;
+                    add_snake_part(snake_food);
+                    snake_food = add_rand_snake_food(window, snake_parts, snake_food_sprite);
+                    food_pos = grid_obj->get_pos(snake_food);
+                    score++;
+                } else if (grid_obj->pos_inside(pos->x, pos->y) && !snake_is_at(pos->x, pos->y, snake_tail->next)) {
+                    grid_obj->set_pos(snake_tail->obj, pos->x, pos->y);
+                    move_snake(snake_tail->obj);
+                } else {
+                    snake_direction = SNAKE_DIRECTION_STOPPED;
+                    cout << "Game Over" << endl;
+                }
             }
         } else {
             snake_delay_count++;
@@ -280,7 +286,7 @@ void snake(int res_x, int res_y)
 
     SDL_Quit();
 
-    return;
+    return score;
 }
 
 void help(char *argv)
@@ -296,6 +302,7 @@ int main (int argc, char *argv[])
 {
     int res_x = DEFAULT_RES_X;
     int res_y = DEFAULT_RES_Y;
+    int score;
 
     int opt;
 
@@ -326,7 +333,10 @@ int main (int argc, char *argv[])
         return 1;
     }
 
-    snake(res_x, res_y);
+    score = snake(res_x, res_y);
+
+    cout << "Score: " << score << endl;
+
     return 0;
 }
 
