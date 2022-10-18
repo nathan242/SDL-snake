@@ -11,7 +11,7 @@
 
 #define BOX_SZ 10
 #define DEFAULT_INITIAL_SNAKE_SIZE 3
-#define SNAKE_MOVE_DELAY 80
+#define DEFAULT_SNAKE_MOVE_DELAY 80
 
 #define SNAKE_DIRECTION_STOPPED 0
 #define SNAKE_DIRECTION_DOWN 1
@@ -144,7 +144,7 @@ graphics_obj *add_rand_snake_food(graphics *window, graphics_obj *snake_parts[],
     return add_snake_food(window, snake_parts, sprite, rand_x, rand_y);
 }
 
-int snake(int res_x, int res_y, int snake_initial_size)
+int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
 {
     // bool vars for control directions and quit event
     bool quit = false;
@@ -238,7 +238,7 @@ int snake(int res_x, int res_y, int snake_initial_size)
             pos = grid_obj->get_pos(snake_head->obj);
         }
 
-        if (snake_delay_count == SNAKE_MOVE_DELAY) {
+        if (snake_delay_count == snake_move_delay) {
             snake_delay_count = 0;
 
             if (snake_direction != SNAKE_DIRECTION_STOPPED) {
@@ -292,11 +292,12 @@ int snake(int res_x, int res_y, int snake_initial_size)
 void help(char *argv)
 {
     cout << "SDL-snake" << endl;
-    cout << "Usage: " << argv << " [-h] [-x X RESOLUTION] [-y Y RESOLUTION] [-s INITIAL SNAKE SIZE]" << endl;
+    cout << "Usage: " << argv << " [-h] [-x X RESOLUTION] [-y Y RESOLUTION] [-s INITIAL SNAKE SIZE] [-d SNAKE DELAY]" << endl;
     cout << " -h - Show this help" << endl;
     cout << " -x X RESOLUTION - Set X resolution (default: " << DEFAULT_RES_X << ")" << endl;
     cout << " -y Y RESOLUTION - Set Y resolution (default: " << DEFAULT_RES_Y << ")" << endl;
     cout << " -s INITIAL SNAKE SIZE - Set initial snake size (default: " << DEFAULT_INITIAL_SNAKE_SIZE << ")" << endl;
+    cout << " -d SNAKE DELAY - Delay before snake moves (default: " << DEFAULT_SNAKE_MOVE_DELAY << ")" << endl;
 }
 
 int main (int argc, char *argv[])
@@ -304,11 +305,12 @@ int main (int argc, char *argv[])
     int res_x = DEFAULT_RES_X;
     int res_y = DEFAULT_RES_Y;
     int initial_snake_size = DEFAULT_INITIAL_SNAKE_SIZE;
+    int snake_move_delay = DEFAULT_SNAKE_MOVE_DELAY;
     int score;
 
     int opt;
 
-    while ((opt = getopt(argc, argv, "hx:y:s:")) != -1) {
+    while ((opt = getopt(argc, argv, "hx:y:s:d:")) != -1) {
         switch (opt) {
             case 'x':
                 res_x = (int)strtol(optarg, NULL, 10);
@@ -320,6 +322,10 @@ int main (int argc, char *argv[])
 
             case 's':
                 initial_snake_size = (int)strtol(optarg, NULL, 10);
+                break;
+
+            case 'd':
+                snake_move_delay = (int)strtol(optarg, NULL, 10);
                 break;
 
             case 'h':
@@ -344,7 +350,7 @@ int main (int argc, char *argv[])
         return 1;
     }
 
-    score = snake(res_x, res_y, initial_snake_size);
+    score = snake(res_x, res_y, initial_snake_size, snake_move_delay);
 
     cout << "Score: " << score << endl;
 
