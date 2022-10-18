@@ -133,7 +133,15 @@ graphics_obj *add_snake_food(graphics *window, graphics_obj *snake_parts[], SDL_
 
 graphics_obj *add_rand_snake_food(graphics *window, graphics_obj *snake_parts[], SDL_Surface* sprite)
 {
-    return add_snake_food(window, snake_parts, sprite, rand() % grid_obj->get_grid_sz_x(), rand() % grid_obj->get_grid_sz_y());
+    int rand_x;
+    int rand_y;
+
+    do {
+        rand_x = rand() % grid_obj->get_grid_sz_x();
+        rand_y = rand() % grid_obj->get_grid_sz_y();
+    } while (snake_is_at(rand_x, rand_y));
+
+    return add_snake_food(window, snake_parts, sprite, rand_x, rand_y);
 }
 
 void snake(int res_x, int res_y)
