@@ -18,6 +18,7 @@ class grid
         int res_y;
         int grid_sz_x;
         int grid_sz_y;
+        int max_grid_units;
 
     public:
         grid(int box_sz_x, int box_sz_y, int res_x, int res_y);
@@ -26,6 +27,7 @@ class grid
         bool pos_inside(int x, int y);
         int get_grid_sz_x();
         int get_grid_sz_y();
+        int get_max_grid_units();
 };
 
 #endif

@@ -9,6 +9,8 @@ grid::grid(int box_sz_x, int box_sz_y, int res_x, int res_y)
 
     this->grid_sz_x = res_x/box_sz_x;
     this->grid_sz_y = res_y/box_sz_y;
+
+    this->max_grid_units = grid_sz_x * grid_sz_y;
 }
 
 void grid::set_pos(graphics_obj* obj, int x, int y)
@@ -40,5 +42,10 @@ int grid::get_grid_sz_x()
 int grid::get_grid_sz_y()
 {
     return grid_sz_y;
+}
+
+int grid::get_max_grid_units()
+{
+    return max_grid_units;
 }
 
