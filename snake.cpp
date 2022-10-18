@@ -291,7 +291,7 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
 
 void help(char *argv)
 {
-    cout << "SDL-snake" << endl;
+    cout << "SDL Snake v1.0.0" << endl;
     cout << "Usage: " << argv << " [-h] [-x X RESOLUTION] [-y Y RESOLUTION] [-s INITIAL SNAKE SIZE] [-d SNAKE DELAY]" << endl;
     cout << " -h - Show this help" << endl;
     cout << " -x X RESOLUTION - Set X resolution (default: " << DEFAULT_RES_X << ")" << endl;
