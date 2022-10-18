@@ -10,7 +10,7 @@
 #define BPP 32
 
 #define BOX_SZ 10
-#define INITIAL_SNAKE_SEGMENTS 3
+#define DEFAULT_INITIAL_SNAKE_SIZE 3
 #define SNAKE_MOVE_DELAY 80
 
 #define SNAKE_DIRECTION_STOPPED 0
@@ -144,7 +144,7 @@ graphics_obj *add_rand_snake_food(graphics *window, graphics_obj *snake_parts[],
     return add_snake_food(window, snake_parts, sprite, rand_x, rand_y);
 }
 
-int snake(int res_x, int res_y)
+int snake(int res_x, int res_y, int snake_initial_size)
 {
     // bool vars for control directions and quit event
     bool quit = false;
@@ -173,7 +173,7 @@ int snake(int res_x, int res_y)
     SDL_FillRect(snake_food_sprite, NULL, SDL_MapRGB(window->screen->format, 255, 0, 0));
 
     // Snake
-    init_snake(window, snake_parts, snake_sprite, INITIAL_SNAKE_SEGMENTS, grid_obj->get_grid_sz_x()/2, grid_obj->get_grid_sz_y()/2);
+    init_snake(window, snake_parts, snake_sprite, snake_initial_size, grid_obj->get_grid_sz_x()/2, grid_obj->get_grid_sz_y()/2);
 
     // Init random number generator
     srand(time(NULL));
@@ -292,21 +292,23 @@ int snake(int res_x, int res_y)
 void help(char *argv)
 {
     cout << "SDL-snake" << endl;
-    cout << "Usage: " << argv << " [-h] [-x X RESOLUTION] [-y Y RESOLUTION]" << endl;
+    cout << "Usage: " << argv << " [-h] [-x X RESOLUTION] [-y Y RESOLUTION] [-s INITIAL SNAKE SIZE]" << endl;
     cout << " -h - Show this help" << endl;
     cout << " -x X RESOLUTION - Set X resolution (default: " << DEFAULT_RES_X << ")" << endl;
     cout << " -y Y RESOLUTION - Set Y resolution (default: " << DEFAULT_RES_Y << ")" << endl;
+    cout << " -s INITIAL SNAKE SIZE - Set initial snake size (default: " << DEFAULT_INITIAL_SNAKE_SIZE << ")" << endl;
 }
 
 int main (int argc, char *argv[])
 {
     int res_x = DEFAULT_RES_X;
     int res_y = DEFAULT_RES_Y;
+    int initial_snake_size = DEFAULT_INITIAL_SNAKE_SIZE;
     int score;
 
     int opt;
 
-    while ((opt = getopt(argc, argv, "hx:y:")) != -1) {
+    while ((opt = getopt(argc, argv, "hx:y:s:")) != -1) {
         switch (opt) {
             case 'x':
                 res_x = (int)strtol(optarg, NULL, 10);
@@ -314,6 +316,10 @@ int main (int argc, char *argv[])
 
             case 'y':
                 res_y = (int)strtol(optarg, NULL, 10);
+                break;
+
+            case 's':
+                initial_snake_size = (int)strtol(optarg, NULL, 10);
                 break;
 
             case 'h':
@@ -333,7 +339,12 @@ int main (int argc, char *argv[])
         return 1;
     }
 
-    score = snake(res_x, res_y);
+    if (initial_snake_size <= 0) {
+        cerr << "Invalid value for initial snake size" << endl;
+        return 1;
+    }
+
+    score = snake(res_x, res_y, initial_snake_size);
 
     cout << "Score: " << score << endl;
 
