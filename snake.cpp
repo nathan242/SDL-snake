@@ -146,6 +146,7 @@ void snake(int res_x, int res_y)
     bool down = false;
 
     int snake_direction = SNAKE_DIRECTION_DOWN;
+    int snake_last_moved = snake_direction;
 
     graphics *window = new graphics("SDL SNAKE", res_x, res_y, BPP);
     grid_obj = new class grid(BOX_SZ, BOX_SZ, res_x, res_y);
@@ -219,10 +220,10 @@ void snake(int res_x, int res_y)
         }
 
         if (snake_direction != SNAKE_DIRECTION_STOPPED) {
-            if (down && snake_direction != SNAKE_DIRECTION_UP) { snake_direction = SNAKE_DIRECTION_DOWN; }
-            if (left && snake_direction != SNAKE_DIRECTION_RIGHT) { snake_direction = SNAKE_DIRECTION_LEFT; }
-            if (right && snake_direction != SNAKE_DIRECTION_LEFT) { snake_direction = SNAKE_DIRECTION_RIGHT; }
-            if (up && snake_direction != SNAKE_DIRECTION_DOWN) { snake_direction = SNAKE_DIRECTION_UP; }
+            if (down && snake_last_moved != SNAKE_DIRECTION_UP) { snake_direction = SNAKE_DIRECTION_DOWN; }
+            if (left && snake_last_moved != SNAKE_DIRECTION_RIGHT) { snake_direction = SNAKE_DIRECTION_LEFT; }
+            if (right && snake_last_moved != SNAKE_DIRECTION_LEFT) { snake_direction = SNAKE_DIRECTION_RIGHT; }
+            if (up && snake_last_moved != SNAKE_DIRECTION_DOWN) { snake_direction = SNAKE_DIRECTION_UP; }
 
             pos = grid_obj->get_pos(snake_head->obj);
         }
@@ -247,6 +248,8 @@ void snake(int res_x, int res_y)
                     pos->y--;
                     break;
             }
+
+            snake_last_moved = snake_direction;
 
             if (pos->x == food_pos->x && pos->y == food_pos->y) {
                 snake_food->sprite = snake_sprite;
