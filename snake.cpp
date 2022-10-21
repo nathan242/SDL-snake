@@ -128,7 +128,7 @@ graphics_obj *add_snake_food(graphics *window, graphics_obj *snake_parts[], SDL_
 
     grid_obj->set_pos(snake_parts[snake_part_count], pos_x, pos_y);
 
-    return snake_parts[snake_part_count++];
+    return snake_parts[snake_part_count];
 }
 
 graphics_obj *add_rand_snake_food(graphics *window, graphics_obj *snake_parts[], SDL_Surface* sprite)
@@ -265,9 +265,15 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
                 if (pos->x == food_pos->x && pos->y == food_pos->y) {
                     snake_food->sprite = snake_sprite;
                     add_snake_part(snake_food);
-                    snake_food = add_rand_snake_food(window, snake_parts, snake_food_sprite);
-                    food_pos = grid_obj->get_pos(snake_food);
                     score++;
+
+                    if (snake_part_count == grid_obj->get_max_grid_units()) {
+                        snake_direction = SNAKE_DIRECTION_STOPPED;
+                        cout << "Complete!" << endl;
+                    } else {
+                        snake_food = add_rand_snake_food(window, snake_parts, snake_food_sprite);
+                        food_pos = grid_obj->get_pos(snake_food);
+                    }
                 } else if (grid_obj->pos_inside(pos->x, pos->y) && !snake_is_at(pos->x, pos->y, snake_tail->next)) {
                     grid_obj->set_pos(snake_tail->obj, pos->x, pos->y);
                     move_snake(snake_tail->obj);
@@ -291,7 +297,7 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
 
 void help(char *argv)
 {
-    cout << "SDL Snake v1.0.0" << endl;
+    cout << "SDL Snake v1.0.1" << endl;
     cout << "Usage: " << argv << " [-h] [-x X RESOLUTION] [-y Y RESOLUTION] [-s INITIAL SNAKE SIZE] [-d SNAKE DELAY]" << endl;
     cout << " -h - Show this help" << endl;
     cout << " -x X RESOLUTION - Set X resolution (default: " << DEFAULT_RES_X << ")" << endl;
