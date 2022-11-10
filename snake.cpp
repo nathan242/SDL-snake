@@ -1,5 +1,6 @@
 #include "graphics.h"
 #include "grid.h"
+#include "images.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <time.h>
@@ -41,6 +42,12 @@ snake_list* snake_tail;
 grid *grid_obj;
 int snake_part_count = 0;
 int snake_delay_count = 0;
+
+SDL_Surface *load_array_surface(unsigned char arr[], int len)
+{
+    SDL_RWops *rw = SDL_RWFromConstMem(arr, len);
+    return IMG_Load_RW(rw, 1);
+}
 
 void add_snake_part(graphics_obj* obj, int direction, SDL_Surface* head_sprite = NULL, SDL_Surface* turn_sprite = NULL)
 {
@@ -202,21 +209,21 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
     graphics_obj *snake_food;
 
     // Sprites
-    SDL_Surface *snake_sprite_head_up = SDL_DisplayFormat(IMG_Load("head_up.png"));
-    SDL_Surface *snake_sprite_head_right = SDL_DisplayFormat(IMG_Load("head_right.png"));
-    SDL_Surface *snake_sprite_head_down = SDL_DisplayFormat(IMG_Load("head_down.png"));
-    SDL_Surface *snake_sprite_head_left = SDL_DisplayFormat(IMG_Load("head_left.png"));
-    SDL_Surface *snake_sprite_tail_up = SDL_DisplayFormat(IMG_Load("tail_up.png"));
-    SDL_Surface *snake_sprite_tail_right = SDL_DisplayFormat(IMG_Load("tail_right.png"));
-    SDL_Surface *snake_sprite_tail_down = SDL_DisplayFormat(IMG_Load("tail_down.png"));
-    SDL_Surface *snake_sprite_tail_left = SDL_DisplayFormat(IMG_Load("tail_left.png"));
+    SDL_Surface *snake_sprite_head_up = load_array_surface(head_up_png, head_up_png_len);
+    SDL_Surface *snake_sprite_head_right = load_array_surface(head_right_png, head_right_png_len);
+    SDL_Surface *snake_sprite_head_down = load_array_surface(head_down_png, head_down_png_len);
+    SDL_Surface *snake_sprite_head_left = load_array_surface(head_left_png, head_left_png_len);
+    SDL_Surface *snake_sprite_tail_up = load_array_surface(tail_up_png, tail_up_png_len);
+    SDL_Surface *snake_sprite_tail_right = load_array_surface(tail_right_png, tail_right_png_len);
+    SDL_Surface *snake_sprite_tail_down = load_array_surface(tail_down_png, tail_down_png_len);
+    SDL_Surface *snake_sprite_tail_left = load_array_surface(tail_left_png, tail_left_png_len);
 
-    SDL_Surface *snake_sprite_down_left = SDL_DisplayFormat(IMG_Load("down_left.png"));
-    SDL_Surface *snake_sprite_up_left = SDL_DisplayFormat(IMG_Load("up_left.png"));
-    SDL_Surface *snake_sprite_up_right = SDL_DisplayFormat(IMG_Load("up_right.png"));
-    SDL_Surface *snake_sprite_right_down = SDL_DisplayFormat(IMG_Load("right_down.png"));
-    SDL_Surface *snake_sprite_vertical = SDL_DisplayFormat(IMG_Load("vertical.png"));
-    SDL_Surface *snake_sprite_horizontal = SDL_DisplayFormat(IMG_Load("horizontal.png"));
+    SDL_Surface *snake_sprite_down_left = load_array_surface(down_left_png, down_left_png_len);
+    SDL_Surface *snake_sprite_up_left = load_array_surface(up_left_png, up_left_png_len);
+    SDL_Surface *snake_sprite_up_right = load_array_surface(up_right_png, up_right_png_len);
+    SDL_Surface *snake_sprite_right_down = load_array_surface(right_down_png, right_down_png_len);
+    SDL_Surface *snake_sprite_vertical = load_array_surface(vertical_png, vertical_png_len);
+    SDL_Surface *snake_sprite_horizontal = load_array_surface(horizontal_png, horizontal_png_len);
 
     map<int, map<int, SDL_Surface*>> snake_direction_sprites;
     snake_direction_sprites[SNAKE_DIRECTION_DOWN][SNAKE_DIRECTION_DOWN] = snake_sprite_vertical;
@@ -238,7 +245,7 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
     snake_tail_sprites[SNAKE_DIRECTION_RIGHT] = snake_sprite_tail_left;
     snake_tail_sprites[SNAKE_DIRECTION_UP] = snake_sprite_tail_down;
 
-    SDL_Surface *snake_food_sprite = SDL_DisplayFormat(IMG_Load("food.png"));
+    SDL_Surface *snake_food_sprite = load_array_surface(food_png, food_png_len);
 
     SDL_Surface *snake_head_next_sprite;
     SDL_Surface *snake_tail_next_sprite;
