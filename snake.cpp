@@ -13,7 +13,10 @@
 
 #define BOX_SZ 10
 #define DEFAULT_INITIAL_SNAKE_SIZE 3
+#define MINIMUM_INITIAL_SNAKE_SIZE 3
 #define DEFAULT_SNAKE_MOVE_DELAY 80
+#define MINIMUM_X_SIZE 20
+#define MINIMUM_Y_SIZE 50
 
 #define SNAKE_DIRECTION_STOPPED 0
 #define SNAKE_DIRECTION_DOWN 1
@@ -42,7 +45,6 @@ int snake_delay_count = 0;
 void add_snake_part(graphics_obj* obj, int direction, SDL_Surface* head_sprite = NULL, SDL_Surface* turn_sprite = NULL)
 {
     snake_list* part = new snake_list;
-    snake_list* current;
 
     if (head_sprite != NULL) {
         obj->sprite = head_sprite;
@@ -56,17 +58,13 @@ void add_snake_part(graphics_obj* obj, int direction, SDL_Surface* head_sprite =
         snake_head = part;
         snake_tail = part;
     } else {
-        current = snake_tail;
-        while (current->next != NULL) {
-            current = current->next;
-        }
-
-        current->next = part;
-        snake_head = part;
+        snake_head->next = part;
 
         if (turn_sprite != NULL) {
-            current->obj->sprite = turn_sprite;
+            snake_head->obj->sprite = turn_sprite;
         }
+
+        snake_head = part;
     }
 
     snake_part_count++;
@@ -242,11 +240,6 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
 
     SDL_Surface *snake_food_sprite = SDL_DisplayFormat(IMG_Load("food.png"));
 
-    //SDL_Surface *snake_sprite = SDL_CreateRGBSurface(0, BOX_SZ, BOX_SZ, 32, 0, 0, 0, 0);
-    //SDL_Surface *snake_food_sprite = SDL_CreateRGBSurface(0, BOX_SZ, BOX_SZ, 32, 0, 0, 0, 0);
-    //SDL_FillRect(snake_sprite, NULL, SDL_MapRGB(window->screen->format, 0, 255, 0));
-    //SDL_FillRect(snake_food_sprite, NULL, SDL_MapRGB(window->screen->format, 255, 0, 0));
-
     SDL_Surface *snake_head_next_sprite;
     SDL_Surface *snake_tail_next_sprite;
     SDL_Surface *snake_turn_sprite;
@@ -348,9 +341,7 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
                 snake_last_moved = snake_direction;
 
                 if (pos->x == food_pos->x && pos->y == food_pos->y) {
-                    //snake_food->sprite = snake_head_next_sprite;
                     add_snake_part(snake_food, snake_direction, snake_head_next_sprite, snake_turn_sprite);
-                    //get_snake_segment(snake_part_count-1)->obj->sprite = snake_turn_sprite;
                     score++;
 
                     if (snake_part_count == grid_obj->get_max_grid_units()) {
@@ -361,10 +352,7 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
                         food_pos = grid_obj->get_pos(snake_food);
                     }
                 } else if (grid_obj->pos_inside(pos->x, pos->y) && !snake_is_at(pos->x, pos->y, snake_tail->next)) {
-                    //grid_obj->set_pos(snake_tail->obj, pos->x, pos->y);
                     move_snake(pos->x, pos->y, snake_direction, snake_head_next_sprite, snake_turn_sprite, snake_tail_next_sprite);
-                    //snake_head->obj->sprite = snake_head_next_sprite;
-                    //get_snake_segment(snake_part_count-1)->obj->sprite = snake_turn_sprite;
                 } else {
                     snake_direction = SNAKE_DIRECTION_STOPPED;
                     cout << "Game Over" << endl;
@@ -385,7 +373,7 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
 
 void help(char *argv)
 {
-    cout << "SDL Snake v1.0.1" << endl;
+    cout << "SDL Snake v1.1.0" << endl;
     cout << "Usage: " << argv << " [-h] [-x X RESOLUTION] [-y Y RESOLUTION] [-s INITIAL SNAKE SIZE] [-d SNAKE DELAY]" << endl;
     cout << " -h - Show this help" << endl;
     cout << " -x X RESOLUTION - Set X resolution (default: " << DEFAULT_RES_X << ")" << endl;
@@ -429,17 +417,17 @@ int main (int argc, char *argv[])
         }
     }
 
-    if (res_x <= 0) {
+    if (res_x < MINIMUM_X_SIZE || res_x % BOX_SZ != 0) {
         cerr << "Invalid value for X resolution" << endl;
         return 1;
     }
 
-    if (res_y <= 0) {
+    if (res_y < MINIMUM_Y_SIZE || res_y % BOX_SZ != 0) {
         cerr << "Invalid value for Y resolution" << endl;
         return 1;
     }
 
-    if (initial_snake_size <= 2) {
+    if (initial_snake_size < MINIMUM_INITIAL_SNAKE_SIZE) {
         cerr << "Invalid value for initial snake size" << endl;
         return 1;
     }
