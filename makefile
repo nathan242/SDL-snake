@@ -1,5 +1,5 @@
 snake: snake.o graphics.o grid.o
-	g++ -o snake -L/usr/local/lib/ -lSDL -lSDL_image snake.o graphics.o grid.o
+	g++ -o snake snake.o graphics.o grid.o `sdl-config --libs` -lSDL_image
 
 snake.o: snake.cpp
 	g++ `sdl-config --cflags` -c snake.cpp

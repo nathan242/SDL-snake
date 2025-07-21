@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <map>
+#include <memory>
 
 #define DEFAULT_RES_X 200
 #define DEFAULT_RES_Y 200
@@ -101,7 +102,7 @@ void move_snake(int pos_x, int pos_y, int direction, SDL_Surface* head_sprite, S
 
 bool snake_is_at(int x, int y, snake_list* start = NULL)
 {
-    grid_pos *pos;
+    unique_ptr<grid_pos> pos;
     snake_list* current;
 
     if (start != NULL) {
@@ -111,7 +112,7 @@ bool snake_is_at(int x, int y, snake_list* start = NULL)
     }
 
     do {
-        pos = grid_obj->get_pos(current->obj);
+        pos.reset(grid_obj->get_pos(current->obj));
         if (pos->x == x && pos->y == y) { return true; }
 
         current = current->next;
@@ -201,11 +202,14 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
 
     graphics *window = new graphics("SDL SNAKE", res_x, res_y, BPP);
     grid_obj = new class grid(BOX_SZ, BOX_SZ, res_x, res_y);
-    grid_pos *pos;
-    grid_pos *food_pos;
+    unique_ptr<grid_pos> pos;
+    unique_ptr<grid_pos> food_pos;
+    int max_grid_units = grid_obj->get_max_grid_units();
+    snake_list* snake_current;
+    snake_list* snake_prev;
 
     // Game objects
-    graphics_obj *snake_parts[grid_obj->get_max_grid_units()];
+    graphics_obj *snake_parts[max_grid_units];
     graphics_obj *snake_food;
 
     // Sprites
@@ -259,7 +263,7 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
 
     // Add first snake food
     snake_food = add_rand_snake_food(window, snake_parts, snake_food_sprite);
-    food_pos = grid_obj->get_pos(snake_food);
+    food_pos.reset(grid_obj->get_pos(snake_food));
 
     // Main loop
     while (quit==false)
@@ -314,7 +318,7 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
             if (right && snake_last_moved != SNAKE_DIRECTION_LEFT) { snake_direction = SNAKE_DIRECTION_RIGHT; }
             if (up && snake_last_moved != SNAKE_DIRECTION_DOWN) { snake_direction = SNAKE_DIRECTION_UP; }
 
-            pos = grid_obj->get_pos(snake_head->obj);
+            pos.reset(grid_obj->get_pos(snake_head->obj));
         }
 
         if (snake_delay_count == snake_move_delay) {
@@ -351,12 +355,12 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
                     add_snake_part(snake_food, snake_direction, snake_head_next_sprite, snake_turn_sprite);
                     score++;
 
-                    if (snake_part_count == grid_obj->get_max_grid_units()) {
+                    if (snake_part_count == max_grid_units) {
                         snake_direction = SNAKE_DIRECTION_STOPPED;
                         cout << "Complete!" << endl;
                     } else {
                         snake_food = add_rand_snake_food(window, snake_parts, snake_food_sprite);
-                        food_pos = grid_obj->get_pos(snake_food);
+                        food_pos.reset(grid_obj->get_pos(snake_food));
                     }
                 } else if (grid_obj->pos_inside(pos->x, pos->y) && !snake_is_at(pos->x, pos->y, snake_tail->next)) {
                     move_snake(pos->x, pos->y, snake_direction, snake_head_next_sprite, snake_turn_sprite, snake_tail_next_sprite);
@@ -374,6 +378,35 @@ int snake(int res_x, int res_y, int snake_initial_size, int snake_move_delay)
     }
 
     SDL_Quit();
+    delete window;
+    delete grid_obj;
+    SDL_FreeSurface(snake_sprite_head_up);
+    SDL_FreeSurface(snake_sprite_head_right);
+    SDL_FreeSurface(snake_sprite_head_down);
+    SDL_FreeSurface(snake_sprite_head_left);
+    SDL_FreeSurface(snake_sprite_tail_up);
+    SDL_FreeSurface(snake_sprite_tail_right);
+    SDL_FreeSurface(snake_sprite_tail_down);
+    SDL_FreeSurface(snake_sprite_tail_left);
+
+    SDL_FreeSurface(snake_sprite_down_left);
+    SDL_FreeSurface(snake_sprite_up_left);
+    SDL_FreeSurface(snake_sprite_up_right);
+    SDL_FreeSurface(snake_sprite_right_down);
+    SDL_FreeSurface(snake_sprite_vertical);
+    SDL_FreeSurface(snake_sprite_horizontal);
+
+    SDL_FreeSurface(snake_food_sprite);
+
+    snake_current = snake_tail;
+    while (snake_current != NULL) {
+        snake_prev = snake_current;
+        delete snake_current->obj;
+        snake_current = snake_current->next;
+        delete snake_prev;
+    }
+
+    delete snake_food;
 
     return score;
 }

@@ -1,0 +1,8 @@
+*.o
+snake
+snake.html
+snake.js
+snake.data
+snake.wasm
+.vscode
+
